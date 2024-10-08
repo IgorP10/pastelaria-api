@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProdutoRequest;
 use App\Services\ProdutoService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\ProdutoRequest;
 use App\Http\Resources\ProdutoResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProdutoController extends Controller
 {
@@ -13,16 +14,17 @@ class ProdutoController extends Controller
     {
     }
 
-    public function index(): ProdutoResource
+    public function index(): JsonResponse
     {
-        $produtos = $this->produtoService->getAll();
+        try {
+            $produtos = $this->produtoService->getAll();
 
-        return new ProdutoResource($produtos);
+            return response()->json(ProdutoResource::collection($produtos));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function create()
-    {
-    }
 
     public function store(ProdutoRequest $request): ProdutoResource
     {
@@ -31,21 +33,38 @@ class ProdutoController extends Controller
         return new ProdutoResource($produto);
     }
 
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
+        try {
+            $produto = $this->produtoService->getById($id);
+
+            return response()->json(new ProdutoResource($produto));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function edit(string $id)
+    public function update(ProdutoRequest $request, string $id): JsonResponse
     {
+        try {
+            $produto = $this->produtoService->getById($id);
+            $produto = $this->produtoService->update($produto, $request->validated());
+
+            return response()->json(new ProdutoResource($produto));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
 
-    public function update(Request $request, string $id)
+    public function destroy(string $id): JsonResponse
     {
-    }
+        try {
+            $this->produtoService->delete($id);
 
-
-    public function destroy(string $id)
-    {
+            return response()->json(null, 204);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 }

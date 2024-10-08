@@ -24,7 +24,7 @@ docker-compose exec laravel php artisan migrate
 
 ```bash
 # Criar uma migration
-docker-compose exec laravel php artisan make:migration create_nome_da_tabela
+docker-compose exec laravel php artisan make:migration create_nome_da_tabela_table
 
 # Rodar método DOWN da última migration que foi aplicada
 docker-compose exec laravel php artisan migrate:rollback

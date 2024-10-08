@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\ClienteService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ClienteRequest;
@@ -15,46 +14,55 @@ class ClienteController extends Controller
     {
     }
 
-    public function index(): ClienteResource|JsonResponse
+    public function index(): JsonResponse
     {
         try {
             $clientes = $this->clienteService->getAll();
 
-            return new ClienteResource($clientes);
+            return response()->json(ClienteResource::collection($clientes));
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }
     }
 
-    public function create()
-    {
-
-    }
-
-    public function store(ClienteRequest $request): ClienteResource
+    public function store(ClienteRequest $request): JsonResponse
     {
         $cliente = $this->clienteService->create($request->validated());
 
-        return new ClienteResource($cliente);
+        return response()->json(new ClienteResource($cliente), 201);
     }
 
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        //
+        try {
+            $cliente = $this->clienteService->getById($id);
+
+            return response()->json(new ClienteResource($cliente));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function edit(string $id)
+    public function update(ClienteRequest $request, string $id): JsonResponse
     {
-        //
+        try {
+            $cliente = $this->clienteService->getById($id);
+            $cliente = $this->clienteService->update($cliente, $request->validated());
+
+            return response()->json(new ClienteResource($cliente));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function update(Request $request, string $id)
+    public function destroy(string $id): JsonResponse
     {
-        //
-    }
+        try {
+            $this->clienteService->delete($id);
 
-    public function destroy(string $id)
-    {
-        //
+            return response()->json(['message' => 'Cliente deletado com sucesso!'], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 }

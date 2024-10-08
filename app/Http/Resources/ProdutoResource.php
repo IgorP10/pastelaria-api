@@ -11,6 +11,7 @@ class ProdutoResource extends JsonResource
         return [
             'id' => $this->id,
             'nome' => $this->nome,
+            'preco' => $this->preco,
             'foto' => $this->foto,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

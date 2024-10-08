@@ -5,12 +5,30 @@ namespace App\Repositories;
 use App\Models\Produto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProdutoRepository
 {
     public function getAll(): Collection
     {
-        return Produto::all();
+        $produtos = Produto::all();
+
+        if ($produtos->isEmpty()) {
+            throw new ModelNotFoundException('Nenhum produto encontrado');
+        }
+
+        return $produtos;
+    }
+
+    public function getById(string $id): Produto
+    {
+        $produto = Produto::find($id);
+
+        if (!$produto) {
+            throw new ModelNotFoundException('Produto não encontrado');
+        }
+
+        return $produto;
     }
 
     public function create(array $data): Model
@@ -23,5 +41,16 @@ class ProdutoRepository
         $produto->update($data);
 
         return $produto;
+    }
+
+    public function delete(string $id): void
+    {
+        $produto = Produto::find($id);
+
+        if (!$produto) {
+            throw new ModelNotFoundException('Produto não encontrado');
+        }
+
+        $produto->delete();
     }
 }

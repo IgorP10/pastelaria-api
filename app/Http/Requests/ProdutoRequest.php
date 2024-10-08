@@ -15,7 +15,19 @@ class ProdutoRequest extends FormRequest
         return [
             'nome' => 'required|string',
             'preco' => 'required|numeric',
-            'foto' => 'required|image',
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'nome.required' => 'O campo nome é obrigatório',
+            'nome.string' => 'O campo nome deve ser uma string',
+            'preco.required' => 'O campo preço é obrigatório',
+            'preco.numeric' => 'O campo preço deve ser um número',
+            'foto.required' => 'O campo foto é obrigatório',
+            'foto.image' => 'O campo foto deve ser uma imagem',
         ];
     }
 }

@@ -18,6 +18,11 @@ class PedidoService
         return $this->pedidoRepository->getAll();
     }
 
+    public function getById(string $id): Pedido
+    {
+        return $this->pedidoRepository->getById($id);
+    }
+
     public function create(array $data): Model
     {
         return $this->pedidoRepository->create($data);
@@ -26,5 +31,10 @@ class PedidoService
     public function update(Pedido $pedido, array $data): Pedido
     {
         return $this->pedidoRepository->update($pedido, $data);
+    }
+
+    public function delete(string $id): void
+    {
+        $this->pedidoRepository->delete($id);
     }
 }

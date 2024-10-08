@@ -11,13 +11,24 @@ class ClienteRepository
 {
     public function getAll(): Collection
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::with('pedidos')->get();
 
         if ($clientes->isEmpty()) {
             throw new ModelNotFoundException('Nenhum cliente encontrado');
         }
 
         return $clientes;
+    }
+
+    public function getById(string $id): Cliente
+    {
+        $cliente = Cliente::with('pedidos')->find($id);
+
+        if (!$cliente) {
+            throw new ModelNotFoundException('Cliente não encontrado');
+        }
+
+        return $cliente;
     }
 
     public function create(array $data): Model
@@ -30,5 +41,16 @@ class ClienteRepository
         $cliente->update($data);
 
         return $cliente;
+    }
+
+    public function delete(string $id): void
+    {
+        $cliente = Cliente::find($id);
+
+        if (!$cliente) {
+            throw new ModelNotFoundException('Cliente não encontrado');
+        }
+
+        $cliente->delete();
     }
 }

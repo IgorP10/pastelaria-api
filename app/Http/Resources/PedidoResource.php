@@ -12,6 +12,7 @@ class PedidoResource extends JsonResource
             'id' => $this->id,
             'cliente_id' => $this->cliente_id,
             'produtos' => $this->produtos,
+            'total' => $this->total,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'cliente' => new ClienteResource($this->whenLoaded('cliente')),

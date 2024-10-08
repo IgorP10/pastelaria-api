@@ -13,10 +13,12 @@ class Pedido extends Model
     protected $fillable = [
         'cliente_id',
         'produtos',
+        'total',
     ];
 
     protected $casts = [
         'produtos' => 'array',
+        'total' => 'decimal:2',
     ];
 
     public function cliente()

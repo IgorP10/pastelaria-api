@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PedidoRequest;
-use App\Http\Resources\PedidoResource;
 use Illuminate\Http\Request;
 use App\Services\PedidoService;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\PedidoRequest;
+use App\Http\Resources\PedidoResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PedidoController extends Controller
 {
@@ -13,38 +15,55 @@ class PedidoController extends Controller
     {
     }
 
-    public function index(): PedidoResource
+    public function index(): JsonResponse
     {
-        $pedidos = $this->pedidoService->getAll();
+        try {
+            $pedidos = $this->pedidoService->getAll();
 
-        return new PedidoResource($pedidos);
+            return response()->json(PedidoResource::collection($pedidos));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function create(PedidoRequest $request): PedidoResource
+    public function store(PedidoRequest $request): JsonResponse
     {
         $pedido = $this->pedidoService->create($request->validated());
 
-        return new PedidoResource($pedido);
+        return response()->json(new PedidoResource($pedido), 201);
     }
 
-    public function store(Request $request)
+    public function show(string $id): JsonResponse
     {
+        try {
+            $pedido = $this->pedidoService->getById($id);
+
+            return response()->json(new PedidoResource($pedido));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function show(string $id)
+    public function update(PedidoRequest $request, string $id): JsonResponse
     {
+        try {
+            $pedido = $this->pedidoService->getById($id);
+            $pedido = $this->pedidoService->update($pedido, $request->validated());
+
+            return response()->json(new PedidoResource($pedido));
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
-    public function edit(string $id)
+    public function destroy(string $id): JsonResponse
     {
-    }
+        try {
+            $this->pedidoService->delete($id);
 
-    public function update(Request $request, string $id)
-    {
-    }
-
-    public function destroy(string $id)
-    {
-        //
+            return response()->json(null, 204);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 }
