@@ -4,14 +4,19 @@ namespace App\Repositories;
 
 use App\Models\Cliente;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ClienteRepository
 {
-    public function getAll(): Collection
+    public function getAll(int $perPage, $page): LengthAwarePaginator
     {
-        $clientes = Cliente::with('pedidos')->get();
+        $clientes = Cliente::with('pedidos')->paginate(
+            $perPage,
+            ['*'],
+            'page',
+            $page
+        );
 
         if ($clientes->isEmpty()) {
             throw new ModelNotFoundException('Nenhum cliente encontrado');

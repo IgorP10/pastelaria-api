@@ -6,6 +6,7 @@ use App\Services\ClienteService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ClienteRequest;
 use App\Http\Resources\ClienteResource;
+use App\Http\Resources\ClienteCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ClienteController extends Controller
@@ -17,9 +18,11 @@ class ClienteController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $clientes = $this->clienteService->getAll();
+            $perPage = request()->input('perPage', 10);
+            $page = request()->input('page', 1);
+            $clientes = $this->clienteService->getAll($perPage, $page);
 
-            return response()->json(ClienteResource::collection($clientes));
+            return response()->json(new ClienteCollection($clientes));
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }

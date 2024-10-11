@@ -15,7 +15,18 @@ class PedidoResource extends JsonResource
             'total' => $this->total,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'cliente' => new ClienteResource($this->whenLoaded('cliente')),
+            'cliente' => [
+                'id' => $this->cliente->id,
+                'nome' => $this->cliente->nome,
+                'email' => $this->cliente->email,
+                'telefone' => $this->cliente->telefone,
+                'endereco' => $this->cliente->endereco,
+                'complemento' => $this->cliente->complemento,
+                'bairro' => $this->cliente->bairro,
+                'cep' => $this->cliente->cep,
+                'created_at' => $this->cliente->created_at,
+                'updated_at' => $this->cliente->updated_at,
+            ],
         ];
     }
 }

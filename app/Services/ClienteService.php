@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Cliente;
 use App\Repositories\ClienteRepository;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClienteService
 {
@@ -13,9 +13,9 @@ class ClienteService
     {
     }
 
-    public function getAll(): Collection
+    public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        return $this->clienteRepository->getAll();
+        return $this->clienteRepository->getAll($perPage, $page);
     }
 
     public function getById(string $id): Cliente

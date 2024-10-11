@@ -19,7 +19,17 @@ class ClienteResource extends JsonResource
             'cep' => $this->cep ?? null,
             'created_at' => $this->created_at ?? null,
             'updated_at' => $this->updated_at ?? null,
-            'pedidos' => !empty($this->pedidos) ? PedidoResource::collection($this->whenLoaded('pedidos')) : null,
+            'pedidos' => $this->whenLoaded('pedidos', function () {
+                return $this->pedidos->map(function ($pedido) {
+                    return [
+                        'id' => $pedido->id,
+                        'produtos' => $pedido->produtos,
+                        'total' => $pedido->total,
+                        'created_at' => $pedido->created_at,
+                        'updated_at' => $pedido->updated_at,
+                    ];
+                });
+            }),
         ];
     }
 }

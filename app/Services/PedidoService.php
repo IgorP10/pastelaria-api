@@ -3,19 +3,22 @@
 namespace App\Services;
 
 use App\Models\Pedido;
+use App\Models\Produto;
 use App\Repositories\PedidoRepository;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PedidoService
 {
-    public function __construct(private PedidoRepository $pedidoRepository)
-    {
+    public function __construct(
+        private PedidoRepository $pedidoRepository,
+        private ProdutoService $produtoService
+    ) {
     }
 
-    public function getAll(): Collection
+    public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        return $this->pedidoRepository->getAll();
+        return $this->pedidoRepository->getAll($perPage, $page);
     }
 
     public function getById(string $id): Pedido
@@ -25,7 +28,28 @@ class PedidoService
 
     public function create(array $data): Model
     {
+        $data = $this->prepareData($data);
         return $this->pedidoRepository->create($data);
+    }
+
+    public function prepareData(array $data): array
+    {
+        $produtos = $data['produtos'];
+        foreach ($produtos as $key => $produto) {
+            $produtoModel = $this->produtoService->getById($produto['id']);
+            $data['total'] = $this->getTotal($produto, $produtoModel);
+            $data['produtos'][$key]['details'] = $produtoModel;
+        }
+
+        return $data;
+    }
+
+    private function getTotal(array $produto, Produto $produtoModel): float
+    {
+        $total = 0;
+        $total += (float) $produtoModel->preco * $produto['quantidade'];
+
+        return $total;
     }
 
     public function update(Pedido $pedido, array $data): Pedido

@@ -4,14 +4,19 @@ namespace App\Repositories;
 
 use App\Models\Produto;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProdutoRepository
 {
-    public function getAll(): Collection
+    public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        $produtos = Produto::all();
+        $produtos = Produto::paginate(
+            $perPage,
+            ['*'],
+            'page',
+            $page
+        );
 
         if ($produtos->isEmpty()) {
             throw new ModelNotFoundException('Nenhum produto encontrado');

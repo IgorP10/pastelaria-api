@@ -4,14 +4,19 @@ namespace App\Repositories;
 
 use App\Models\Pedido;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PedidoRepository
 {
-    public function getAll(): Collection
+    public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        $pedidos = Pedido::all();
+        $pedidos = Pedido::with('cliente')->paginate(
+            $perPage,
+            ['*'],
+            'page',
+            $page
+        );
 
         if ($pedidos->isEmpty()) {
             throw new ModelNotFoundException('Nenhum pedido encontrado');

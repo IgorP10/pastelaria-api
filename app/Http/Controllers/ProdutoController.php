@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProdutoCollection;
 use App\Services\ProdutoService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ProdutoRequest;
@@ -17,9 +18,11 @@ class ProdutoController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $produtos = $this->produtoService->getAll();
+            $perPage = request()->input('perPage', 10);
+            $page = request()->input('page', 1);
+            $produtos = $this->produtoService->getAll($perPage, $page);
 
-            return response()->json(ProdutoResource::collection($produtos));
+            return response()->json(new ProdutoCollection($produtos));
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }
@@ -62,7 +65,7 @@ class ProdutoController extends Controller
         try {
             $this->produtoService->delete($id);
 
-            return response()->json(null, 204);
+            return response()->json(['message' => 'Produto deletado com sucesso!'], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         }
