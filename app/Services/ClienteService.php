@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Cliente;
 use App\Repositories\ClienteRepository;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClienteService
@@ -23,18 +22,27 @@ class ClienteService
         return $this->clienteRepository->getById($id);
     }
 
-    public function create(array $data): Model
+    public function create(array $data): Cliente
     {
+        $data['data_nascimento'] = $this->formatDate($data['data_nascimento']);
         return $this->clienteRepository->create($data);
     }
 
-    public function update(Cliente $cliente, array $data): Cliente
+    private function formatDate(string $date): string
     {
+        return date('Y-m-d', strtotime($date));
+    }
+
+    public function update(string $id, array $data): Cliente
+    {
+        $cliente = $this->getById($id);
+        
         return $this->clienteRepository->update($cliente, $data);
     }
 
     public function delete(string $id): void
     {
-        $this->clienteRepository->delete($id);
+        $cliente = $this->getById($id);
+        $this->clienteRepository->delete($cliente);
     }
 }

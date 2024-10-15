@@ -12,15 +12,16 @@ class ClienteRequest extends FormRequest
 
     public function rules(): array
     {
+        $id = $this->route('cliente');
         return [
             'nome' => 'required|string',
-            'email' => 'required|email|unique:clientes,email',
+            'email' => 'required|email|unique:clientes,email,' . $id,
             'telefone' => 'required|string|max:15',
             'data_nascimento' => 'required|date',
             'endereco' => 'required|string|max:255',
             'complemento' => 'nullable|string|max:255',
             'bairro' => 'required|string|max:255',
-            'cep' => 'required|string|max:9',
+            'cep' => 'required|string|max:10',
         ];
     }
 

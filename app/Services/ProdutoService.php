@@ -35,14 +35,16 @@ class ProdutoService
         return $data['foto']->store('produtos', 'public');
     }
 
-    public function update(Produto $produto, array $data): Produto
+    public function update(string $id, array $data): Produto
     {
+        $produto = $this->getById($id);
         $data['foto'] = $this->generateImagePath($data);
         return $this->produtoRepository->update($produto, $data);
     }
 
     public function delete(string $id): void
     {
-        $this->produtoRepository->delete($id);
+        $produto = $this->getById($id);
+        $this->produtoRepository->delete($produto);
     }
 }

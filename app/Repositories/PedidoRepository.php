@@ -4,41 +4,32 @@ namespace App\Repositories;
 
 use App\Models\Pedido;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PedidoRepository
 {
     public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        $pedidos = Pedido::with('cliente')->paginate(
+        return Pedido::with('cliente')->paginate(
             $perPage,
             ['*'],
             'page',
             $page
         );
-
-        if ($pedidos->isEmpty()) {
-            throw new ModelNotFoundException('Nenhum pedido encontrado');
-        }
-
-        return $pedidos;
     }
 
     public function getById(string $id): Pedido
     {
-        $pedido = Pedido::find($id);
-
-        if (!$pedido) {
-            throw new ModelNotFoundException('Pedido não encontrado');
-        }
-
-        return $pedido;
+        return Pedido::with('cliente')->findOrFail($id);
     }
 
-    public function create(array $data): Model
+    public function create(array $data): Pedido
     {
-        return Pedido::create($data);
+        $pedido = Pedido::create($data);
+        $pedido->load('cliente');
+
+        return $pedido;
     }
 
     public function update(Pedido $pedido, array $data): Pedido
@@ -48,14 +39,8 @@ class PedidoRepository
         return $pedido;
     }
 
-    public function delete(string $id): void
+    public function delete(Pedido $pedido): void
     {
-        $pedido = Pedido::find($id);
-
-        if (!$pedido) {
-            throw new ModelNotFoundException('Pedido não encontrado');
-        }
-
         $pedido->delete();
     }
 }

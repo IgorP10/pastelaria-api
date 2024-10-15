@@ -28,6 +28,8 @@ class ProdutoRequest extends FormRequest
             'preco.numeric' => 'O campo preço deve ser um número',
             'foto.required' => 'O campo foto é obrigatório',
             'foto.image' => 'O campo foto deve ser uma imagem',
+            'foto.mimes' => 'O campo foto deve ser uma imagem do tipo: jpeg, png, jpg, gif ou svg',
+            'foto.max' => 'O campo foto deve ter no máximo 2048 bytes',
         ];
     }
 }

@@ -21,8 +21,8 @@ class Cliente extends Model
         'cep',
     ];
 
-    protected $dates = [
-        'data_nascimento',
+    protected $casts = [
+        'data_nascimento' => 'date',
     ];
 
     public function pedidos()

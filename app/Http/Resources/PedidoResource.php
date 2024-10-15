@@ -10,23 +10,22 @@ class PedidoResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'cliente_id' => $this->cliente_id,
+            'cliente' => $this->whenLoaded('cliente', function () {
+                return [
+                    'id' => $this->cliente->id,
+                    'nome' => $this->cliente->nome,
+                    'email' => $this->cliente->email,
+                    'telefone' => $this->cliente->telefone,
+                    'endereco' => $this->cliente->endereco,
+                    'complemento' => $this->cliente->complemento,
+                    'bairro' => $this->cliente->bairro,
+                    'cep' => $this->cliente->cep,
+                ];
+            }),
             'produtos' => $this->produtos,
             'total' => $this->total,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'cliente' => [
-                'id' => $this->cliente->id,
-                'nome' => $this->cliente->nome,
-                'email' => $this->cliente->email,
-                'telefone' => $this->cliente->telefone,
-                'endereco' => $this->cliente->endereco,
-                'complemento' => $this->cliente->complemento,
-                'bairro' => $this->cliente->bairro,
-                'cep' => $this->cliente->cep,
-                'created_at' => $this->cliente->created_at,
-                'updated_at' => $this->cliente->updated_at,
-            ],
+            'updated_at' => $this->updated_at
         ];
     }
 }

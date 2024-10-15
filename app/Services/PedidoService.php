@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Jobs\SendPedidoEmail;
 use App\Models\Pedido;
 use App\Models\Produto;
 use App\Repositories\PedidoRepository;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PedidoService
@@ -26,18 +26,23 @@ class PedidoService
         return $this->pedidoRepository->getById($id);
     }
 
-    public function create(array $data): Model
+    public function create(array $data): Pedido
     {
         $data = $this->prepareData($data);
-        return $this->pedidoRepository->create($data);
+        $pedido = $this->pedidoRepository->create($data);
+
+        $this->triggerJobToSendEmail($pedido);
+
+        return $pedido;
     }
 
     public function prepareData(array $data): array
     {
         $produtos = $data['produtos'];
+        $data['total'] = 0;
         foreach ($produtos as $key => $produto) {
             $produtoModel = $this->produtoService->getById($produto['id']);
-            $data['total'] = $this->getTotal($produto, $produtoModel);
+            $data['total'] += $this->getTotal($produto, $produtoModel);
             $data['produtos'][$key]['details'] = $produtoModel;
         }
 
@@ -52,13 +57,24 @@ class PedidoService
         return $total;
     }
 
-    public function update(Pedido $pedido, array $data): Pedido
+    public function update(string $id, array $data): Pedido
     {
-        return $this->pedidoRepository->update($pedido, $data);
+        $pedido = $this->getById($id);
+        $data = $this->prepareData($data);
+        $pedidoUpdated = $this->pedidoRepository->update($pedido, $data);
+        $this->triggerJobToSendEmail($pedido);
+
+        return $pedidoUpdated;
     }
 
     public function delete(string $id): void
     {
-        $this->pedidoRepository->delete($id);
+        $pedido = $this->getById($id);
+        $this->pedidoRepository->delete($pedido);
+    }
+
+    private function triggerJobToSendEmail(Pedido $pedido): void
+    {
+        SendPedidoEmail::dispatch($pedido);
     }
 }

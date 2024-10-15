@@ -18,6 +18,12 @@ docker-compose exec laravel php artisan key:generate
 
 # Rodar as migrations
 docker-compose exec laravel php artisan migrate
+
+# Rodar Testes
+docker-compose exec laravel php artisan test
+
+# Rodar Fila
+docker-compose exec laravel php artisan queue:work
 ```
 
 ## Extra

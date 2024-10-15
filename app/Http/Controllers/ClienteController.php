@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ClienteRequest;
 use App\Http\Resources\ClienteResource;
 use App\Http\Resources\ClienteCollection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 class ClienteController extends Controller
 {
@@ -17,55 +17,39 @@ class ClienteController extends Controller
 
     public function index(): JsonResponse
     {
-        try {
-            $perPage = request()->input('perPage', 10);
-            $page = request()->input('page', 1);
-            $clientes = $this->clienteService->getAll($perPage, $page);
+        $perPage = request()->input('perPage', 10);
+        $page = request()->input('page', 1);
+        $clientes = $this->clienteService->getAll($perPage, $page);
 
-            return response()->json(new ClienteCollection($clientes));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-        }
+        return response()->json(new ClienteCollection($clientes), Response::HTTP_OK);
     }
 
     public function store(ClienteRequest $request): JsonResponse
     {
         $cliente = $this->clienteService->create($request->validated());
 
-        return response()->json(new ClienteResource($cliente), 201);
+        return response()->json(new ClienteResource($cliente), Response::HTTP_CREATED);
     }
 
     public function show(string $id): JsonResponse
     {
-        try {
-            $cliente = $this->clienteService->getById($id);
+        $cliente = $this->clienteService->getById($id);
 
-            return response()->json(new ClienteResource($cliente));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-        }
+        return response()->json(new ClienteResource($cliente), Response::HTTP_OK);
+
     }
 
     public function update(ClienteRequest $request, string $id): JsonResponse
     {
-        try {
-            $cliente = $this->clienteService->getById($id);
-            $cliente = $this->clienteService->update($cliente, $request->validated());
+        $cliente = $this->clienteService->update($id, $request->validated());
 
-            return response()->json(new ClienteResource($cliente));
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-        }
+        return response()->json(new ClienteResource($cliente), Response::HTTP_OK);
     }
 
     public function destroy(string $id): JsonResponse
     {
-        try {
-            $this->clienteService->delete($id);
+        $this->clienteService->delete($id);
 
-            return response()->json(['message' => 'Cliente deletado com sucesso!'], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-        }
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

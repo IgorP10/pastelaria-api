@@ -9,16 +9,15 @@ class ClienteResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id ?? null,
-            'nome' => $this->nome ?? null,
-            'email' => $this->email ?? null,
-            'telefone' => $this->telefone ?? null,
-            'endereco' => $this->endereco ?? null,
-            'complemento' => $this->complemento ?? null,
-            'bairro' => $this->bairro ?? null,
-            'cep' => $this->cep ?? null,
-            'created_at' => $this->created_at ?? null,
-            'updated_at' => $this->updated_at ?? null,
+            'id' => $this->id,
+            'nome' => $this->nome,
+            'email' => $this->email,
+            'telefone' => $this->telefone,
+            'data_nascimento' => $this->data_nascimento->format('Y-m-d'),
+            'endereco' => $this->endereco,
+            'complemento' => $this->complemento,
+            'bairro' => $this->bairro,
+            'cep' => $this->cep,
             'pedidos' => $this->whenLoaded('pedidos', function () {
                 return $this->pedidos->map(function ($pedido) {
                     return [
@@ -30,6 +29,8 @@ class ClienteResource extends JsonResource
                     ];
                 });
             }),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

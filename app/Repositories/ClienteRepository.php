@@ -11,32 +11,20 @@ class ClienteRepository
 {
     public function getAll(int $perPage, $page): LengthAwarePaginator
     {
-        $clientes = Cliente::with('pedidos')->paginate(
+        return Cliente::with('pedidos')->paginate(
             $perPage,
             ['*'],
             'page',
             $page
         );
-
-        if ($clientes->isEmpty()) {
-            throw new ModelNotFoundException('Nenhum cliente encontrado');
-        }
-
-        return $clientes;
     }
 
     public function getById(string $id): Cliente
     {
-        $cliente = Cliente::with('pedidos')->find($id);
-
-        if (!$cliente) {
-            throw new ModelNotFoundException('Cliente não encontrado');
-        }
-
-        return $cliente;
+        return Cliente::with('pedidos')->findOrFail($id);
     }
 
-    public function create(array $data): Model
+    public function create(array $data): Cliente
     {
         return Cliente::create($data);
     }
@@ -48,14 +36,8 @@ class ClienteRepository
         return $cliente;
     }
 
-    public function delete(string $id): void
+    public function delete(Cliente $cliente): void
     {
-        $cliente = Cliente::find($id);
-
-        if (!$cliente) {
-            throw new ModelNotFoundException('Cliente não encontrado');
-        }
-
         $cliente->delete();
     }
 }

@@ -3,40 +3,26 @@
 namespace App\Repositories;
 
 use App\Models\Produto;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProdutoRepository
 {
     public function getAll(int $perPage, int $page): LengthAwarePaginator
     {
-        $produtos = Produto::paginate(
+        return Produto::paginate(
             $perPage,
             ['*'],
             'page',
             $page
         );
-
-        if ($produtos->isEmpty()) {
-            throw new ModelNotFoundException('Nenhum produto encontrado');
-        }
-
-        return $produtos;
     }
 
     public function getById(string $id): Produto
     {
-        $produto = Produto::find($id);
-
-        if (!$produto) {
-            throw new ModelNotFoundException('Produto não encontrado');
-        }
-
-        return $produto;
+        return Produto::findOrFail($id);
     }
 
-    public function create(array $data): Model
+    public function create(array $data): Produto
     {
         return Produto::create($data);
     }
@@ -48,14 +34,8 @@ class ProdutoRepository
         return $produto;
     }
 
-    public function delete(string $id): void
+    public function delete(Produto $produto): void
     {
-        $produto = Produto::find($id);
-
-        if (!$produto) {
-            throw new ModelNotFoundException('Produto não encontrado');
-        }
-
         $produto->delete();
     }
 }
